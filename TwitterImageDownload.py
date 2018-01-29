@@ -4,10 +4,10 @@
 import twitter
 
 #setting up the twitter API
-api = twitter.Api(consumer_key='GL8yu2YuHIsPsXsC2i5LPTjAQ',
-                  consumer_secret='8877gjZLPM2JUzaie8cFLjitQfKQJC9f95fi7V4UmBQI8sxKzU',
-                  access_token_key='955567149921251328-JI7mFxDlfMvN7jMyxiy2XzA9hZQeLL0',
-                  access_token_secret='yLQaK3aoGcuA6dIUonYiYPOEfmtBxXWdGTVtXltlfJs03')
+api = twitter.Api(consumer_key='',
+                  consumer_secret='',
+                  access_token_key='',
+                  access_token_secret='')
 
 status = api.GetUserTimeline(screen_name='realDonaldTrump', count=20)#the twitter user and how many tweets to check
 
