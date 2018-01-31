@@ -1,8 +1,10 @@
 #Adam Surette
 #Twitter API is python-twitter at https://github.com/bear/python-twitter
 
-import twitter #the twitter api
+import twitter        #the twitter api
 import urllib.request #used to actually download the images and save them
+import subprocess     #runs command lines in program, used to run ffmpeg
+import os
 
 #setting up the twitter API
 api = twitter.Api(consumer_key='',
@@ -10,7 +12,13 @@ api = twitter.Api(consumer_key='',
                   access_token_key='',
                   access_token_secret='')
 
-status = api.GetUserTimeline(screen_name='ec500dev', count=20)#the twitter user and how many tweets to check
+#this deletes all the .jpg in the current folder in case you run the program multiple times in a row
+#for each file in the current directory (where the downloaded images will be) if it is a .jpg delete it
+for file in os.listdir():
+    if file.endswith('.jpg'):
+        os.remove(file)
+
+status = api.GetUserTimeline(screen_name='realDonaldTrump', count=100)#the twitter user and how many tweets to check
 
 picTweets = [] #this is a list that will hold all the image urls for download later
 
@@ -31,6 +39,18 @@ picTweetsLength = len(picTweets) #gets the length of the pic tweets list for a f
 #this for loop goes through the urls we found for the images and saves them to the local files as JPEGs
 for x in range(0,picTweetsLength):
     string = 'twitterImage'
-    string += str(x)
+    stringNum = str(x)
+    #the following if statements find the digits in the current photo so that it can add a correct number of
+    #leading 0s to the name of the file, for example the stringNum is 1 so we need it to be 001
+    if len(stringNum) == 1:
+        string += '00'
+        string += stringNum
+    elif len(stringNum) == 2:
+        string += '0'
+        string += stringNum
+    elif len(stringNum) == 3: #example 100 so no leading zeroes
+        string += stringNum
     string += '.jpg'
     urllib.request.urlretrieve(picTweets[x], string)
+
+subprocess.run('ffmpeg -framerate 24 -i twitterImage%03d.jpg output.mp4')
