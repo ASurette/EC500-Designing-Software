@@ -4,7 +4,7 @@
 import twitter        #the twitter api
 import urllib.request #used to actually download the images and save them
 import subprocess     #runs command lines in program, used to run ffmpeg
-import os
+import os             #this library if for operating os things such as removing files
 
 #setting up the twitter API
 api = twitter.Api(consumer_key='',
@@ -17,6 +17,10 @@ api = twitter.Api(consumer_key='',
 for file in os.listdir():
     if file.endswith('.jpg'):
         os.remove(file)
+
+#if you ran the program before delete the old video
+if os.path.isfile('output.mp4'):
+    os.remove('output.mp4')
 
 status = api.GetUserTimeline(screen_name='realDonaldTrump', count=100)#the twitter user and how many tweets to check
 
@@ -41,7 +45,7 @@ for x in range(0,picTweetsLength):
     string = 'twitterImage'
     stringNum = str(x)
     #the following if statements find the digits in the current photo so that it can add a correct number of
-    #leading 0s to the name of the file, for example the stringNum is 1 so we need it to be 001
+    #leading 0s to the name of the file, for example the stringNum is 1 so we need it to be 001, 10 we need 010 etc.
     if len(stringNum) == 1:
         string += '00'
         string += stringNum
@@ -51,6 +55,6 @@ for x in range(0,picTweetsLength):
     elif len(stringNum) == 3: #example 100 so no leading zeroes
         string += stringNum
     string += '.jpg'
-    urllib.request.urlretrieve(picTweets[x], string)
+    urllib.request.urlretrieve(picTweets[x], string) #downloads the image and saves it as twitterImageXXX.jpg
 
-subprocess.run('ffmpeg -framerate 24 -i twitterImage%03d.jpg output.mp4')
+subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
