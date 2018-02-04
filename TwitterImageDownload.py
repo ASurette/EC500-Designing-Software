@@ -4,15 +4,12 @@ import twitter          #the twitter api
 import urllib.request   #used to actually download the images and save them
 import subprocess       #runs command lines in program, used to run ffmpeg
 import os               #this library if for operating os things such as removing files and adding the google app credentials
-import json
-import googleapiclient
+import io
 
 #setting up the Google API/Vision API
-from googleapiclient.discovery import build
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = " PATH/TO/YOUR/GOOGLE/PROJECT/JSON/OBJECT " #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
-service = build('vision', 'v1')
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = " PATH/TO/GOOGLE/JSON/AUTH " #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
 
-#setting up the twitter API, you need to put your own keys in
+#setting up the twitter API
 api = twitter.Api(consumer_key='',
                   consumer_secret='',
                   access_token_key='',
@@ -45,6 +42,7 @@ for i in range(0, length):#for each of the tweets grabbed
 #print(picTweets)#prints the list of tweets
 
 picTweetsLength = len(picTweets) #gets the length of the pic tweets list for a for loop
+imgList = [] #a list of the name of all the images that will be saved
 
 #this for loop goes through the urls we found for the images and saves them to the local files as JPEGs
 for x in range(0,picTweetsLength):
@@ -62,7 +60,29 @@ for x in range(0,picTweetsLength):
         string += stringNum
     string += '.jpg'
     urllib.request.urlretrieve(picTweets[x], string) #downloads the image and saves it as twitterImageXXX.jpg
+    imgList.append(string) #adding the name of the file to the list of images
 
-subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
+#subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
 
-#service.images.annotate('output.mp4')
+#----------------------------------------------------------------------------------------------
+#This next section sets up and uses the Google Vision API
+#I used this tutorial below to figure out how it works
+#https://www.youtube.com/watch?v=nMY0qDg16y4
+#Thanks to Doug Beney in the comments for showing the updated code for ptyhon 3
+
+from google.cloud import vision
+from google.cloud.vision import types
+vision_client = vision.ImageAnnotatorClient()
+
+file_name = 'twitterImage000.jpg'
+
+with io.open(file_name, 'rb') as image_file:
+    content = image_file.read()
+
+image = types.Image(content=content)
+
+response = vision_client.label_detection(image=image)
+labels = response.label_annotations
+
+for label in labels:
+    print(label.description)
