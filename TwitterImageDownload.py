@@ -1,12 +1,18 @@
-#Adam Surette
-#Twitter API is python-twitter at https://github.com/bear/python-twitter
+#code written by Adam Surette for EC500C1
 
-import twitter        #the twitter api
-import urllib.request #used to actually download the images and save them
-import subprocess     #runs command lines in program, used to run ffmpeg
-import os             #this library if for operating os things such as removing files
+import twitter          #the twitter api
+import urllib.request   #used to actually download the images and save them
+import subprocess       #runs command lines in program, used to run ffmpeg
+import os               #this library if for operating os things such as removing files and adding the google app credentials
+import json
+import googleapiclient
 
-#setting up the twitter API
+#setting up the Google API/Vision API
+from googleapiclient.discovery import build
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = " PATH/TO/YOUR/GOOGLE/PROJECT/JSON/OBJECT " #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
+service = build('vision', 'v1')
+
+#setting up the twitter API, you need to put your own keys in
 api = twitter.Api(consumer_key='',
                   consumer_secret='',
                   access_token_key='',
@@ -22,7 +28,7 @@ for file in os.listdir():
 if os.path.isfile('output.mp4'):
     os.remove('output.mp4')
 
-status = api.GetUserTimeline(screen_name='realDonaldTrump', count=100)#the twitter user and how many tweets to check
+status = api.GetUserTimeline(screen_name='Osama_amasO', count=100)#the twitter user and how many tweets to check
 
 picTweets = [] #this is a list that will hold all the image urls for download later
 
@@ -58,3 +64,5 @@ for x in range(0,picTweetsLength):
     urllib.request.urlretrieve(picTweets[x], string) #downloads the image and saves it as twitterImageXXX.jpg
 
 subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
+
+#service.images.annotate('output.mp4')
