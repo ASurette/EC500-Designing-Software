@@ -1,6 +1,19 @@
 # EC500-Designing-Software
 My repo for EC500C1
 
+The function takes a Twitter handle as an input and searches the last 100 tweets from that handle for images.
+It downloads those images and runs them through Google Vision and gets the labels for each image. These labels
+are saved in a list and this list is the final output. It also uses ffmpeg to generate a video of the images and displays
+each for 2 seconds. It finds the file path of this video and adds it to the end of the output list. This means that
+the number of images is the length of the list-1 and the last value in the list is the file path
+
+(there is a bug where the first image in the video is on screen 3x longer than it should be)
+
+The errors follow the syntax Error XXX: error message
+
+So far it checks if the Twitter handle is viable, if there are any images within the tweets searched
+and if ffmpeg created the video
+
 The libraries used for the project are
 
 python-twitter: to get the twitter API into python
