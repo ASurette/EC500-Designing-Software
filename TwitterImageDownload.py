@@ -1,88 +1,110 @@
 #code written by Adam Surette for EC500C1
 
-import twitter          #the twitter api
-import urllib.request   #used to actually download the images and save them
-import subprocess       #runs command lines in program, used to run ffmpeg
-import os               #this library if for operating os things such as removing files and adding the google app credentials
-import io
+def TwitterDownload(twitterHandler):
 
-#setting up the Google API/Vision API
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = " PATH/TO/GOOGLE/JSON/AUTH " #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
+    import twitter          #the twitter api
+    import urllib.request   #used to actually download the images and save them
+    import subprocess       #runs command lines in program, used to run ffmpeg
+    import os               #this library if for operating os things such as removing files and adding the google app credentials
+    import io               #used for reading the images we saved so we can send them to google vision
 
-#setting up the twitter API
-api = twitter.Api(consumer_key='',
-                  consumer_secret='',
-                  access_token_key='',
-                  access_token_secret='')
+    #setting up the Google API/Vision API
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = " PATH/TO/GOOGLE/JSON/AUTH " #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
 
-#this deletes all the .jpg in the current folder in case you run the program multiple times in a row
-#for each file in the current directory (where the downloaded images will be) if it is a .jpg delete it
-for file in os.listdir():
-    if file.endswith('.jpg'):
-        os.remove(file)
+    #setting up the twitter API
+    api = twitter.Api(consumer_key='',
+                      consumer_secret='',
+                      access_token_key='',
+                      access_token_secret='')
 
-#if you ran the program before delete the old video
-if os.path.isfile('output.mp4'):
-    os.remove('output.mp4')
+    #this deletes all the .jpg in the current folder in case you run the program multiple times in a row
+    #for each file in the current directory (where the downloaded images will be) if it is a .jpg delete it
+    for file in os.listdir():
+        if file.endswith('.jpg'):
+            os.remove(file)
 
-status = api.GetUserTimeline(screen_name='Osama_amasO', count=100)#the twitter user and how many tweets to check
+    #if you ran the program before delete the old video
+    if os.path.isfile('output.mp4'):
+        os.remove('output.mp4')
 
-picTweets = [] #this is a list that will hold all the image urls for download later
+    # -----------------Twitter Section----------------------------------------------
+    # This section uses the twitter api to download pictures from the Twitter handle the user inputs
+    # It checks the number of tweets the user inputs
 
-length = len(status)#how many tweets there are in status
-
-for i in range(0, length):#for each of the tweets grabbed
-    #a try except block because if you try to read the media of a tweet that doesn't have media you get an error
     try:
-        if status[i].media[0].type == 'photo':   #is there an image attached to the tweet
-            picTweets.append(status[i].media[0].media_url) #add the media url to the picsTweets list
-    except: #if we would error, meaning the tweet doesn't have the correct media, do nothing
-        pass
+        status = api.GetUserTimeline(screen_name=twitterHandler, count=25)#the twitter user and how many tweets to check
+    except:
+        return 'This Twitter handle is not valid'
 
-#print(picTweets)#prints the list of tweets
+    picTweets = [] #this is a list that will hold all the image urls for download later
 
-picTweetsLength = len(picTweets) #gets the length of the pic tweets list for a for loop
-imgList = [] #a list of the name of all the images that will be saved
+    length = len(status)#how many tweets there are in status
 
-#this for loop goes through the urls we found for the images and saves them to the local files as JPEGs
-for x in range(0,picTweetsLength):
-    string = 'twitterImage'
-    stringNum = str(x)
-    #the following if statements find the digits in the current photo so that it can add a correct number of
-    #leading 0s to the name of the file, for example the stringNum is 1 so we need it to be 001, 10 we need 010 etc.
-    if len(stringNum) == 1:
-        string += '00'
-        string += stringNum
-    elif len(stringNum) == 2:
-        string += '0'
-        string += stringNum
-    elif len(stringNum) == 3: #example 100 so no leading zeroes
-        string += stringNum
-    string += '.jpg'
-    urllib.request.urlretrieve(picTweets[x], string) #downloads the image and saves it as twitterImageXXX.jpg
-    imgList.append(string) #adding the name of the file to the list of images
+    for i in range(0, length):#for each of the tweets grabbed
+        #a try except block because if you try to read the media of a tweet that doesn't have media you get an error
+        try:
+            if status[i].media[0].type == 'photo':   #is there an image attached to the tweet
+                picTweets.append(status[i].media[0].media_url) #add the media url to the picsTweets list
+        except: #if we would error, meaning the tweet doesn't have the correct media, do nothing
+            pass
 
-#subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
+    picTweetsLength = len(picTweets) #gets the length of the pic tweets list for a for loop
+    imgList = [] #a list of the name of all the images that will be saved
 
-#----------------------------------------------------------------------------------------------
-#This next section sets up and uses the Google Vision API
-#I used this tutorial below to figure out how it works
-#https://www.youtube.com/watch?v=nMY0qDg16y4
-#Thanks to Doug Beney in the comments for showing the updated code for ptyhon 3
+    #this for loop goes through the urls we found for the images and saves them to the local files as JPEGs
+    for x in range(0,picTweetsLength):
+        string = 'twitterImage'
+        stringNum = str(x)
+        #the following if statements find the digits in the current photo so that it can add a correct number of
+        #leading 0s to the name of the file, for example the stringNum is 1 so we need it to be 001, 10 we need 010 etc.
+        if len(stringNum) == 1:
+            string += '00'
+            string += stringNum
+        elif len(stringNum) == 2:
+            string += '0'
+            string += stringNum
+        elif len(stringNum) == 3: #example 100 so no leading zeroes
+            string += stringNum
+        string += '.jpg'
+        urllib.request.urlretrieve(picTweets[x], string) #downloads the image and saves it as twitterImageXXX.jpg
+        imgList.append(string) #adding the name of the file to the list of images
 
-from google.cloud import vision
-from google.cloud.vision import types
-vision_client = vision.ImageAnnotatorClient()
+    #--------------------------Google Vision-----------------------------------------------------
+    #I used this tutorial below to figure out how it works
+    #https://www.youtube.com/watch?v=nMY0qDg16y4
+    #Thanks to Doug Beney in the comments for showing the updated code for python 3
 
-file_name = 'twitterImage000.jpg'
+    imageLabels = [] #a list that will hold the labels of each image, will be the final output
 
-with io.open(file_name, 'rb') as image_file:
-    content = image_file.read()
+    #setting up google vision
+    from google.cloud import vision
+    from google.cloud.vision import types
+    vision_client = vision.ImageAnnotatorClient()
 
-image = types.Image(content=content)
+    #for all the images we downloaded open the image, run it through google vision and
+    for i in range (0,len(imgList)):
+        with io.open(imgList[i], 'rb') as image_file:
+            content = image_file.read()
 
-response = vision_client.label_detection(image=image)
-labels = response.label_annotations
+        image = types.Image(content=content)
+        response = vision_client.label_detection(image=image)
+        labels = response.label_annotations
 
-for label in labels:
-    print(label.description)
+        tempList = [] #temporary list to save all the labels in one list then save that list in the imageLabels list
+        for label in labels:
+            tempList.append(label.description)
+
+        imageLabels.append(tempList) #add the list to imageLabels
+
+    # ---------------------------FFMPEG--------------------------------------
+    #this part creates the movies out of the images downloaded
+    #note that there is a bug that the first image stays on screen 3x longer than it should
+    #prof said to ignore it
+    subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
+
+    return imageLabels
+    #end of function
+
+#calling the function
+output = TwitterDownload(twitterHandler='')
+print(output)
