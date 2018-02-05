@@ -7,9 +7,13 @@ def TwitterDownload(twitterHandler):
     import subprocess       #runs command lines in program, used to run ffmpeg
     import os               #this library if for operating os things such as removing files and adding the google app credentials
     import io               #used for reading the images we saved so we can send them to google vision
+    from google.cloud import vision
+    from google.cloud.vision import types
 
     #setting up the Google API/Vision API
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = " PATH/TO/GOOGLE/JSON/AUTH " #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "PATH/TO/GOOGLE/JSON/AUTH" #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
+
+    vision_client = vision.ImageAnnotatorClient() #setting up the image annotator client for Google Vision
 
     #setting up the twitter API
     api = twitter.Api(consumer_key='',
@@ -32,9 +36,9 @@ def TwitterDownload(twitterHandler):
     # It checks the number of tweets the user inputs
 
     try:
-        status = api.GetUserTimeline(screen_name=twitterHandler, count=25)#the twitter user and how many tweets to check
+        status = api.GetUserTimeline(screen_name=twitterHandler, count=100)#the twitter user and how many tweets to check
     except:
-        return 'This Twitter handle is not valid'
+        return 'Error 001: This Twitter handle is not valid'
 
     picTweets = [] #this is a list that will hold all the image urls for download later
 
@@ -69,6 +73,11 @@ def TwitterDownload(twitterHandler):
         urllib.request.urlretrieve(picTweets[x], string) #downloads the image and saves it as twitterImageXXX.jpg
         imgList.append(string) #adding the name of the file to the list of images
 
+        # Checking if any images were found within the 100 tweets scanned, if there are none then there is an error
+        # returned as the output
+    if len(imgList) == 0:
+        return 'Error 002: There are no images found'
+
     #--------------------------Google Vision-----------------------------------------------------
     #I used this tutorial below to figure out how it works
     #https://www.youtube.com/watch?v=nMY0qDg16y4
@@ -76,14 +85,9 @@ def TwitterDownload(twitterHandler):
 
     imageLabels = [] #a list that will hold the labels of each image, will be the final output
 
-    #setting up google vision
-    from google.cloud import vision
-    from google.cloud.vision import types
-    vision_client = vision.ImageAnnotatorClient()
-
     #for all the images we downloaded open the image, run it through google vision and
-    for i in range (0,len(imgList)):
-        with io.open(imgList[i], 'rb') as image_file:
+    for i in range (0,len(imgList)):                    #for all the images we downloaded
+        with io.open(imgList[i], 'rb') as image_file:   #open
             content = image_file.read()
 
         image = types.Image(content=content)
@@ -102,9 +106,18 @@ def TwitterDownload(twitterHandler):
     #prof said to ignore it
     subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
 
-    return imageLabels
+    #getting the file path of the video, adds it to the end of the labels for the images
+    if os.path.isfile('output.mp4'):
+        videoPath = os.getcwd()
+        videoPath += '/output.mp4'
+        imageLabels.append(videoPath)
+    else:
+        return 'Error 003: ffmpeg could not create the video properly'
+
+    return imageLabels #return the labels of all the functions as the final output
     #end of function
 
 #calling the function
 output = TwitterDownload(twitterHandler='')
 print(output)
+
