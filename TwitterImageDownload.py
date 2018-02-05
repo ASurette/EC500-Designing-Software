@@ -102,6 +102,9 @@ def TwitterDownload(twitterHandler):
 
     # ---------------------------FFMPEG--------------------------------------
     #this part creates the movies out of the images downloaded
+    #change the number after framerate to change how long each image is on screen
+    #1/2 means each image is on screen for 2 seconds, 1/5 5 seconds etc
+
     #note that there is a bug that the first image stays on screen 3x longer than it should
     #prof said to ignore it
     subprocess.run('ffmpeg -framerate 1/2 -i twitterImage%03d.jpg output.mp4')
