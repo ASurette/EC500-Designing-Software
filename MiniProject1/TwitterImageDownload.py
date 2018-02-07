@@ -11,11 +11,13 @@ def TwitterDownload(twitterHandler):
     from google.cloud.vision import types
 
     #setting up the Google API/Vision API
+    #replace PATH/TO/GOOGLE/JSON/AUTH with your file path to your google json authentification file
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "PATH/TO/GOOGLE/JSON/AUTH" #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
 
     vision_client = vision.ImageAnnotatorClient() #setting up the image annotator client for Google Vision
 
     #setting up the twitter API
+    #add you own keys here
     api = twitter.Api(consumer_key='',
                       consumer_secret='',
                       access_token_key='',
