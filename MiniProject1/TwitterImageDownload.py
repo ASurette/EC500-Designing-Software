@@ -12,16 +12,27 @@ def TwitterDownload(twitterHandler):
 
     #setting up the Google API/Vision API
     #replace PATH/TO/GOOGLE/JSON/AUTH with your file path to your google json authentification file
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "PATH/TO/GOOGLE/JSON/AUTH" #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
+    
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'C:/Users/abbot/Desktop/Everything/College/Building_Software/API_Exercise/MFP-75c79c884e32.json' #sets up the GOOGLE_APPLICATION_CREDENTIALS as an enviornment variable
 
     vision_client = vision.ImageAnnotatorClient() #setting up the image annotator client for Google Vision
 
+    
+    # Used to read OAuth data from a local text file, so as to upload keys
+    OAuthFilePath = 'C:/Users/abbot/Desktop/Everything/College/Building_Software/API_Exercise/pyOAuth.txt'
+    with open(OAuthFilePath) as fp:
+        consumer_key = fp.readline().rstrip('\n')
+        consumer_secret = fp.readline().rstrip('\n')
+        access_token_key = fp.readline().rstrip('\n')
+        access_token_secret = fp.readline().rstrip('\n')
+    
+
     #setting up the twitter API
     #add you own keys here
-    api = twitter.Api(consumer_key='',
-                      consumer_secret='',
-                      access_token_key='',
-                      access_token_secret='')
+    api = twitter.Api(consumer_key,
+                      consumer_secret,
+                      access_token_key,
+                      access_token_secret)
 
     #this deletes all the .jpg in the current folder in case you run the program multiple times in a row
     #for each file in the current directory (where the downloaded images will be) if it is a .jpg delete it
@@ -123,6 +134,6 @@ def TwitterDownload(twitterHandler):
     #end of function
 
 #calling the function
-output = TwitterDownload(twitterHandler='')
+output = TwitterDownload(twitterHandler='ElonMusk')
 print(output)
 
