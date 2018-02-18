@@ -5,6 +5,10 @@ HW1API is my modified version of their project (only small things like adding an
 
 HW1API_Test1 are my test cases for the code. It has 4 cases, just comment one and uncomment another. It times how long it takes to run and how many bytes it downloads. 
 
+WebpageFlask.py is how I am making my webpage
+
+templates has the html files, layout asks the user for a Twitter username and then it calls the HW1API, output displays the Google Vision API description labesls, it does not currently play the video but I am working on it
+
 I have added multiple issues there and a code review. I will also add the that code review here.
 
 The datapath:
