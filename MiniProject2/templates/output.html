@@ -33,6 +33,7 @@ function loadImageFileAsURL()
             {
                 var imageLoaded = document.createElement("video");
                 imageLoaded.src = fileLoadedEvent.target.result;
+                imageLoaded.autoplay = true;
                 document.body.appendChild(imageLoaded);
             };
             fileReader.readAsDataURL(fileToLoad);
