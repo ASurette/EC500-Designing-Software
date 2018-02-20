@@ -1,5 +1,19 @@
-The code is based on one big function and uses synchronous programming. That means that the whole process is single threaded, and it has a big wait time and then finishes suddenly. The code itself is broken up into three main parts: the twitter API image grabber, google vision that creates descriptions of those images, and finally FFMPEG that creates a video slideshow of the images. Additionally, the code includes a few imported modules that are used to download images from URLs and to give the script access to local files and the command prompt in use. The code convention and readability are pretty good. It is very thoroughly commented, and although a few of the variables could use more explanatory names, most of the variables and functions are aptly named.
+The code is based on one big function and uses synchronous programming. That means that the whole process is single threaded, and it has a big wait
+time and then finishes suddenly. The code itself is broken up into three main parts: the twitter API image grabber, google vision that creates
+descriptions of those images, and finally FFMPEG that creates a video slideshow of the images. Additionally, the code includes a few imported modules
+that are used to download images from URLs and to give the script access to local files and the command prompt in use. The code convention and
+readability are pretty good. It is very thoroughly commented, and although a few of the variables could use more explanatory names, most of the
+variables and functions are aptly named.
 
-There are three created errors that can be thrown in the code. Error 001, the twitter API error, claims that the twitter username is invalid. However, this error is ALSO thrown if the credentials are wrong, creating confusion on what actually needs to be fixed. This is shown in one of the test cases. Google vision throws it's own well explained errors (with authorization), and will tell the user if the authentification didn't work. Error 002 claims that no images were found. This is a straightforward error and it works well. The last error, Error 003, claims that ffmpeg did not properly create the video. This error checks if the video file that was supposed to be created is actually located in teh local directory. The problem with this is that when ffmpeg DOES fail, it still creates the video file, it's just corrupted. Therefore the error is not thrown when ffmpeg actually does have an error.
+There are three created errors that can be thrown in the code. Error 001, the twitter API error, claims that the twitter username is invalid.
+However, this error is ALSO thrown if the credentials are wrong, creating confusion on what actually needs to be fixed. This is shown in one of the
+test cases. Google vision throws it's own well explained errors (with authorization), and will tell the user if the authentification didn't work.
+Error 002 claims that no images were found. This is a straightforward error and it works well. The last error, Error 003, claims that ffmpeg did not
+properly create the video. This error checks if the video file that was supposed to be created is actually located in teh local directory. The
+problem with this is that when ffmpeg DOES fail, it still creates the video file, it's just corrupted. Therefore the error is not thrown when ffmpeg
+actually does have an error.
 
-Some of the bugs that I've found are as follows. FFMPEG is not correctly making a video from the images. In some cases it doesn't use all of the pictures and the lengths of each image in the video do not matchup. I believe this is a problem in the ffmpeg command itself. My own program uses a much longer command that includes more formatting arguments and such to make sure all of the files are compatible to work with each other and be combined in a single video. A few smaller things are the necessity of hardcoding the twitter handle and the security keys is annoying.
+Some of the bugs that I've found are as follows. FFMPEG is not correctly making a video from the images. In some cases it doesn't use all of the
+pictures and the lengths of each image in the video do not matchup. I believe this is a problem in the ffmpeg command itself. My own program uses a
+much longer command that includes more formatting arguments and such to make sure all of the files are compatible to work with each other and be
+combined in a single video. A few smaller things are the necessity of hardcoding the twitter handle and the security keys is annoying.
