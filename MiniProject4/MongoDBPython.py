@@ -3,18 +3,18 @@ client = MongoClient();
 db = client.twitter_mongo_database;
 td = db.twitter_data;
 
-#ask the user for a twitter handle to search for and make it lowercase
-twitter_handle = input("What is the Twitter Handle you want to search for? ").lower();
-
-from TwitterDownload import TwitterDownload
-outputList = TwitterDownload(twitter_handle);#the list output of the twitter program
-
-#the list of the google vision labels
-twitterList = outputList[0];
-#the list of links to the images
-picTweets = outputList[1];
-
 def DatabaseUpdate():
+    # ask the user for a twitter handle to search for and make it lowercase
+    twitter_handle = input("What is the Twitter Handle you want to search for? ").lower();
+
+    from TwitterDownload import TwitterDownload
+    outputList = TwitterDownload(twitter_handle);  # the list output of the twitter program
+
+    # the list of the google vision labels
+    twitterList = outputList[0];
+    # the list of links to the images
+    picTweets = outputList[1];
+
     #a dict it will have all the data that will go in the database saved into it, starts with the user's input as the twitter handle name
     data = {"Twitter Handle": twitter_handle,
             "Image Links": picTweets,
@@ -98,6 +98,50 @@ def DatabaseUpdate():
 
         db.td.insert_one(data);
 
-DatabaseUpdate();
+#TotalTags gets all the tags from all images from all twitter handles and puts them in a large list
+def TotalTags():
+
+    tag_list = [];#this list will hold all the tags and counts how many times a word appears
+
+    for doc in db.td.find({}):
+        num_images = doc.get("Number of Images Saved");
+        for x in range(0, num_images):
+            name = "image" + str(x);
+            temp = doc.get(name);
+            tag_list = tag_list + temp;
+
+    return tag_list;
+
+#Calculate Tags goes through the tag_list and counts how many times each word or phrase appears and puts them
+#in a dict with the format {word/phrase: number of times it appears}
+def CalculateTags():
+    tag_list = TotalTags();
+
+    #a dict that will hold all the words and how many times they each appeared in all the images
+    counted_dict = {};
+
+    #for each word/phrase in the list count how many times it appears
+    for word in tag_list:
+        #go through the tag_list and find all copies of that word
+        indicies = [index for index, value in enumerate(tag_list) if value == word];
+
+        indicies.reverse();#reverse the index list because we need to delete some values later and you can go out of bounds
+
+        #since it returns a list with the indicies of the times it appears then the lenght of that list
+        #is the number of times it appears
+        times_appeared = len(indicies);
+
+        #add the word adn the number of times it appears into the list
+        counted_dict[word] = times_appeared;
+
+        if (len(indicies) != 0):
+            for val in indicies:
+                del tag_list[val];#delete the words from the list so we don't count the same word over and over again
+
+    return counted_dict;
+
+DatabaseUpdate(); #uncomment this if you want to add to the database
+print(CalculateTags());
 
 #db.td.delete_many({});#deletes all documents, used in testing
+
