@@ -36,7 +36,7 @@ def TwitterDownload(twitterHandler):
     # It checks the number of tweets the user inputs
 
     try:
-        status = api.GetUserTimeline(screen_name=twitterHandler, count=100)#the twitter user and how many tweets to check
+        status = api.GetUserTimeline(screen_name=twitterHandler, count=50)#the twitter user and how many tweets to check
     except:
         return 'Error 001: This Twitter handle is not valid'
 
