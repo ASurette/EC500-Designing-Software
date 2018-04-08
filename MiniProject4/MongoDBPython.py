@@ -108,7 +108,14 @@ def TotalTags():
         for x in range(0, num_images):
             name = "image" + str(x);
             temp = doc.get(name);
-            tag_list = tag_list + temp;
+            if(type(temp) == list):
+                tag_list = tag_list + temp;
+
+    db.td.insert_one({'Day One Tags': tag_list});
+
+    #db.td.insert_one({'Day Two Tags': tag_list});
+
+    #db.td.insert_one({'Day Three Tags': tag_list});
 
     return tag_list;
 
